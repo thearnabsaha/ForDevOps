@@ -15,24 +15,14 @@ app.use(morgan(morganFormat));
 app.use(helmet());
 
 app.use(cors({
-    origin: "http://localhost:5173", // allow your React frontend
-    credentials: true,              // allow cookies if needed
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
-app.options("*", cors({
-    origin: "http://localhost:5173",
-    credentials: true
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
 }));
 
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static('public'));
 app.use(cookieParser());
-app.use((req, res, next) => {
-    res.setHeader("Cache-Control", "no-store");
-    next();
-});
 app.get('/health', async (req, res) => {
     const start = Date.now();
     const healthcheck = {
