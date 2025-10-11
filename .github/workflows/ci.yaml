@@ -1,28 +1,56 @@
-name: Deploy to AWS VM
+name: Deploy MyApp to AWS VM
 
 on:
   push:
+    # Trigger only when changes are pushed to the main branch
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # Step 2: Set up SSH key
       - name: Set up SSH key
         run: |
           echo "${{ secrets.AWS_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Deploy to AWS VM
+      # Step 3: Deploy specific app to AWS VM
+      - name: Deploy MyApp
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-            cd /home/${{ secrets.AWS_USER }}/ForDevOps
+            
+            # Navigate to the specific app folder
+            APP_DIR="/home/${{ secrets.AWS_USER }}/ForDevOps/MyApp"
+            cd $APP_DIR
+
+            # --- Install Node.js if missing ---
+            if ! command -v node > /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+              sudo apt install -y nodejs
+            fi
+
+            # --- Install PM2 globally if missing ---
+            if ! command -v pm2 > /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Pull latest code for this app only
             git pull origin main
-            npm i pm2
+
+            # Install app dependencies
+            npm install
+
+            # Restart the app using PM2, or start if not running
             pm2 restart all
+
+            # Save PM2 process list to auto-start on reboot
+            pm2 save
+
           EOF
