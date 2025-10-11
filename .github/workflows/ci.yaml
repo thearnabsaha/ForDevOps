@@ -26,32 +26,42 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             
-            # Navigate to the specific app folder
-            APP_DIR="/home/${{ secrets.AWS_USER }}/ForDevOps/MyApp"
-            cd $APP_DIR
+APP_DIR="/home/${{ secrets.AWS_USER }}/ForDevOps/MyApp"
+      mkdir -p $APP_DIR
+      cd $APP_DIR
 
-            # --- Install Node.js if missing ---
-            if ! command -v node > /dev/null; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-              source ~/.bashrc
-              nvm install --lts
-            fi
+      # --- Install git if missing ---
+      if ! command -v git > /dev/null; then
+        sudo apt update
+        sudo apt install -y git
+      fi
 
-            # --- Install PM2 globally if missing ---
-            if ! command -v pm2 > /dev/null; then
-              sudo npm install -g pm2
-            fi
+      # --- Clone repo if not exists, else pull ---
+      if [ ! -d ".git" ]; then
+        git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
+      else
+        git pull origin main
+      fi
 
-            # Pull latest code for this app only
-            git pull origin main
+      # --- Install Node.js using NVM if missing ---
+      if ! command -v node > /dev/null; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm install --lts
+        nvm use --lts
+      fi
 
-            # Install app dependencies
-            npm install
+      # --- Install PM2 globally if missing ---
+      if ! command -v pm2 > /dev/null; then
+        npm install -g pm2
+      fi
 
-            # Restart the app using PM2, or start if not running
-            pm2 restart all
+      # --- Install app dependencies ---
+      npm install
 
-            # Save PM2 process list to auto-start on reboot
-            pm2 save
+      # --- Restart or start app using PM2 ---
+      pm2 restart myapp || pm2 start npm --name "myapp" -- start
+      pm2 save
 
           EOF
