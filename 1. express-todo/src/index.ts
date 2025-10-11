@@ -40,7 +40,7 @@ app.get('/health', async (req, res) => {
     res.status(200).json(healthcheck);
 });
 app.get('/', (req, res) => {
-    res.send('hello from simple server :)');
+    res.send('Its a beautiful world');
 });
 // GET all todos
 app.get("/todos", (req, res) => {
