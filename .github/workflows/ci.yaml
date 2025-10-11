@@ -1,67 +1,28 @@
-name: Deploy MyApp to AWS VM
+name: Deploy to AWS VM
 
 on:
   push:
-    # Trigger only when changes are pushed to the main branch
     branches:
-      - main
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Step 2: Set up SSH key
       - name: Set up SSH key
         run: |
           echo "${{ secrets.AWS_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # Step 3: Deploy specific app to AWS VM
-      - name: Deploy MyApp
+      - name: Deploy to AWS VM
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-            
-APP_DIR="/home/${{ secrets.AWS_USER }}/ForDevOps/MyApp"
-      mkdir -p $APP_DIR
-      cd $APP_DIR
-
-      # --- Install git if missing ---
-      if ! command -v git > /dev/null; then
-        sudo apt update
-        sudo apt install -y git
-      fi
-
-      # --- Clone repo if not exists, else pull ---
-      if [ ! -d ".git" ]; then
-        git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
-      else
-        git pull origin main
-      fi
-
-      # --- Install Node.js using NVM if missing ---
-      if ! command -v node > /dev/null; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        nvm install --lts
-        nvm use --lts
-      fi
-
-      # --- Install PM2 globally if missing ---
-      if ! command -v pm2 > /dev/null; then
-        npm install -g pm2
-      fi
-
-      # --- Install app dependencies ---
-      npm install
-
-      # --- Restart or start app using PM2 ---
-      pm2 restart myapp || pm2 start npm --name "myapp" -- start
-      pm2 save
-
+            cd /home/${{ secrets.AWS_USER }}/ForDevOps
+            git pull origin main
+            pm2 -version || npm install -g pm2
+            pm2 restart all
           EOF
