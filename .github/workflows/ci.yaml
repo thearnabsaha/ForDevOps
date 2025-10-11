@@ -23,6 +23,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             cd /home/${{ secrets.AWS_USER }}/ForDevOps
             git pull origin main
-          pm2 start ecosystem.config.js --env production || pm2 restart ecosystem.config.js --env production
-            pm2 save
           EOF
