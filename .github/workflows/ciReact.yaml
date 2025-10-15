@@ -23,8 +23,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"1. express-todo"
+            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"2. react-express-todo"/backend
             git pull origin main
+            npm install
+            npm run build
+            pm2 restart all
+            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"2. react-express-todo"/frontend
             npm install
             npm run build
             pm2 restart all

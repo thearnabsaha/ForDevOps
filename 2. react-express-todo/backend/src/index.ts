@@ -34,7 +34,7 @@ app.get('/health', async (req, res) => {
     res.status(200).json(healthcheck);
 });
 app.get('/', (req, res) => {
-    res.send('hello from simple server :)');
+    res.send('hello from simple server!');
 });
 // GET all todos
 app.get("/todos", (req, res) => {

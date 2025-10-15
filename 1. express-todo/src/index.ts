@@ -36,7 +36,7 @@ app.get('/health', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Its a beautiful world!!');
+    res.send('Its a beautiful world ;)');
     // res.send('Its a beautiful world!');
 });
 // GET all todos

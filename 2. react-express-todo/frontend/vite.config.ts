@@ -7,5 +7,10 @@ export default defineConfig({
     proxy: {
       "/todos": "http://localhost:3000"
     }
+  },
+  preview: {
+    allowedHosts: ["etodo.grevelops.co"],
+    host: "0.0.0.0", // ensure preview binds to all interfaces
+    port: 4173       // optional, make it explicit
   }
 });
