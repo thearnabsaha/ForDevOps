@@ -4,4 +4,4 @@ export interface Todo {
     completed: boolean;
 }
 
-export let todos: Todo[] = [];
+export const todos: Todo[] = [];
