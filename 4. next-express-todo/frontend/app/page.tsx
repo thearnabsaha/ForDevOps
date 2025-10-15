@@ -9,7 +9,7 @@ interface Todo {
   completed: boolean;
 }
 
-const API = "http://localhost:3001/todos"; // <-- change to your Express port
+const API = "http://localhost:3003/todos"; // <-- change to your Express port
 
 export default function Page() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -106,8 +106,8 @@ export default function Page() {
               <span
                 onClick={() => toggleTodo(todo.id)}
                 className={`flex-1 cursor-pointer ${todo.completed
-                    ? "line-through text-gray-400"
-                    : "text-gray-800"
+                  ? "line-through text-gray-400"
+                  : "text-gray-800"
                   }`}
               >
                 {todo.title}

@@ -2,7 +2,7 @@ import express from 'express';
 const app = express();
 import dotenv from 'dotenv';
 dotenv.config();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3003;
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -15,7 +15,7 @@ app.use(morgan(morganFormat));
 app.use(helmet());
 
 app.use(cors({
-    origin: "http://localhost:3000", // allow your React frontend
+    origin: "http://localhost:3004", // allow your React frontend
     credentials: true,              // allow cookies if needed
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
