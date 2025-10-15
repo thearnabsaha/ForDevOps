@@ -28,7 +28,6 @@ jobs:
             npm install
             touch .env
             echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
-            export $(grep -v '^#' .env | xargs)
             npx prisma generate
             npx prisma migrate deploy
             npm run build
