@@ -23,7 +23,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            pwd
             cd /home/${{ secrets.AWS_USER }}/ForDevOps
+            pwd
             git pull origin main
             npm install
             npm run build
