@@ -26,6 +26,7 @@ jobs:
             cd /home/${{ secrets.AWS_USER }}/ForDevOps
             git pull origin main
             npm install -g pnpm
+            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"
             pnpm install  
             pnpm run build
 
