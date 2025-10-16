@@ -1,4 +1,4 @@
-name: Deploy React App to AWS VM 
+name: Deploy Next Prisma App to AWS VM 
 
 on:
   push:
@@ -28,6 +28,7 @@ jobs:
             npm install
             touch .env
             echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
+            echo "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" >> .env
             npx prisma generate
             npx prisma migrate deploy
             npm run build

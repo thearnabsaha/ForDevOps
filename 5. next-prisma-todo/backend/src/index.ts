@@ -17,7 +17,8 @@ app.use(morgan(morganFormat));
 app.use(helmet());
 
 app.use(cors({
-    origin: "http://localhost:3004",
+    origin: process.env.CORS_URL,
+    // origin: "http://localhost:3004",
     credentials: true,
 }));
 // app.use(cors({
