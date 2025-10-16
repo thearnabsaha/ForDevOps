@@ -43,12 +43,15 @@ jobs:
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/backend
             git pull origin main
             touch .env
+            echo "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" >> .env
             pm2 describe monorepo-prisma-backend-app > /dev/null && pm2 restart monorepo-prisma-backend-app || pm2 start "npm start" --name monorepo-prisma-backend-app
 
 
             # Frontend deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/web
-            pm2 describe monorepo-prisma-todo-app > /dev/null && pm2 restart monorepo-prisma-todo-app || pm2 start "npm run start -- -p 3004" --name monorepo-prisma-todo-app
+            touch .env
+            echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003" >> .env
+            pm2 describe monorepo-prisma-frontend-app > /dev/null && pm2 restart monorepo-prisma-frontend-app || pm2 start "npm run start -- -p 3004" --name monorepo-prisma-frontend-app
 
 
             # WebSocket deployment steps
