@@ -57,8 +57,10 @@ jobs:
             # WebSocket deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/ws
             pm2 describe monorepo-ws-todo-app > /dev/null && pm2 restart monorepo-ws-todo-app || pm2 start "npm run start -- -p 3004" --name monorepo-ws-todo-app
+
+
             #Final Restart
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"
-            pnpm install  
             pnpm run build
+            pm2 restart all
           EOF
