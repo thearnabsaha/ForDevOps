@@ -43,6 +43,8 @@ jobs:
     - name: Deploy to AWS VM
       run: |
         ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
-        sudo docker run -d -p 3001:3001 ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
+        sudo docker run -d -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+        sudo docker run -d -p 4173:4173 ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
         EOF
