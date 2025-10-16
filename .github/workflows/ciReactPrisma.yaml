@@ -31,9 +31,9 @@ jobs:
             npx prisma generate
             npx prisma migrate deploy
             npm run build
-            pm2 start "npm start" --name react-prisma-backend-app || pm2 restart all
+            pm2 describe react-prisma-backend-app > /dev/null && pm2 restart react-prisma-backend-app || pm2 start "npm start" --name react-prisma-backend-app
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"6. react-prisma-todo"/frontend
             npm install
             npm run build
-            pm2 start "npm run preview -- --host 0.0.0.0" --name react-prisma-frontend-app || pm2 restart all
+            pm2 describe react-prisma-frontend-app > /dev/null && pm2 restart react-prisma-frontend-app || pm2 start "npm run preview -- --host 0.0.0.0" --name react-prisma-frontend-app
           EOF

@@ -28,12 +28,14 @@ jobs:
             npm install
             touch .env
             echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
+            echo "NEXT_PUBLIC_API_URL='${{ secrets.AWS_HOST }}'" > .env
             npx prisma generate
             npx prisma migrate deploy
             npm run build
-            pm2 start "npm start" --name next-prisma-backend-app || pm2 restart all
+            pm2 describe next-prisma-backend-app > /dev/null && pm2 restart next-prisma-backend-app || pm2 start "npm start" --name next-prisma-backend-app
+
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"5. next-prisma-todo"/frontend
             npm install
             npm run build
-            pm2 start "npm run start -- -p 3004" --name next-prisma-todo-app || pm2 restart all
+            pm2 describe next-prisma-todo-app > /dev/null && pm2 restart next-prisma-todo-app || pm2 start "npm run start -- -p 3004" --name next-prisma-todo-app
           EOF
