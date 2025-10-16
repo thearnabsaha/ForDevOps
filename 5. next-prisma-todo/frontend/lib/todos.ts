@@ -1,7 +1,7 @@
-export interface Todo {
-    id: number;
-    title: string;
-    completed: boolean;
-}
+// export interface Todo {
+//     id: number;
+//     title: string;
+//     completed: boolean;
+// }
 
-export const todos: Todo[] = [];
+// export const todos: Todo[] = [];
