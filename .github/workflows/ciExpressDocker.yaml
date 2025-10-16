@@ -31,8 +31,10 @@ jobs:
         file: ./1-express-todo/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
+
     - name: Deploy to AWS VM
       run: |
         ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-          sudo docker run -p 3001:3001 hparnab/express-todo:latest
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
+        sudo docker run -d -p 3001:3001 ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
         EOF
