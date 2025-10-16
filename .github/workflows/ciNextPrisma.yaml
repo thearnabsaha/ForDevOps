@@ -1,43 +1,43 @@
-name: Deploy Next Prisma App to AWS VM 
+# name: Deploy Next Prisma App to AWS VM 
 
-on:
-  push:
-    branches:
-      - main 
+# on:
+#   push:
+#     branches:
+#       - main 
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        run: |
-          echo "${{ secrets.AWS_KEY }}" > key.pem
-          chmod 600 key.pem
+#       - name: Set up SSH key
+#         run: |
+#           echo "${{ secrets.AWS_KEY }}" > key.pem
+#           chmod 600 key.pem
 
-      - name: Deploy to AWS VM
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"5. next-prisma-todo"/backend
-            git pull origin main
-            npm install
-            touch .env
-            echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
-            echo "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" >> .env
-            npx prisma generate
-            npx prisma migrate deploy
-            npm run build
-            pm2 describe next-prisma-backend-app > /dev/null && pm2 restart next-prisma-backend-app || pm2 start "npm start" --name next-prisma-backend-app
+#       - name: Deploy to AWS VM
+#         run: |
+#           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+#             export NVM_DIR="$HOME/.nvm"
+#             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+#             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"5. next-prisma-todo"/backend
+#             git pull origin main
+#             npm install
+#             touch .env
+#             echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
+#             echo "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" >> .env
+#             npx prisma generate
+#             npx prisma migrate deploy
+#             npm run build
+#             pm2 describe next-prisma-backend-app > /dev/null && pm2 restart next-prisma-backend-app || pm2 start "npm start" --name next-prisma-backend-app
 
-            cd /home/${{ secrets.AWS_USER }}/ForDevOps/"5. next-prisma-todo"/frontend
-            touch .env
-            echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003" >> .env
-            npm install
-            npm run build
-            pm2 describe next-prisma-todo-app > /dev/null && pm2 restart next-prisma-todo-app || pm2 start "npm run start -- -p 3004" --name next-prisma-todo-app
-          EOF
+#             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"5. next-prisma-todo"/frontend
+#             touch .env
+#             echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003" >> .env
+#             npm install
+#             npm run build
+#             pm2 describe next-prisma-todo-app > /dev/null && pm2 restart next-prisma-todo-app || pm2 start "npm run start -- -p 3004" --name next-prisma-todo-app
+#           EOF
