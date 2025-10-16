@@ -28,7 +28,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./"1. express-todo"/Dockerfile
+        file: /home/${{ secrets.AWS_USER }}/ForDevOps/"1. express-todo"/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
     - name: Deploy to AWS VM
