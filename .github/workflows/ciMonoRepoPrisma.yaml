@@ -28,21 +28,29 @@ jobs:
             npm install -g pnpm
             pnpm install  
             pnpm run build
-# prisma deployment steps
+
+
+            # prisma deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/packages/database
             touch .env
             echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
             npx prisma generate
             npx prisma migrate deploy
-# Backend deployment steps
+
+
+            # Backend deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/backend
             git pull origin main
             touch .env
             pm2 describe monorepo-prisma-backend-app > /dev/null && pm2 restart monorepo-prisma-backend-app || pm2 start "npm start" --name monorepo-prisma-backend-app
-# Frontend deployment steps
+
+
+            # Frontend deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/web
             pm2 describe monorepo-prisma-todo-app > /dev/null && pm2 restart monorepo-prisma-todo-app || pm2 start "npm run start -- -p 3004" --name monorepo-prisma-todo-app
-# WebSocket deployment steps
+
+
+            # WebSocket deployment steps
             cd /home/${{ secrets.AWS_USER }}/ForDevOps/"7. monorepo-todo"/apps/ws
             pm2 describe monorepo-ws-todo-app > /dev/null && pm2 restart monorepo-ws-todo-app || pm2 start "npm run start -- -p 3004" --name monorepo-ws-todo-app
           EOF
