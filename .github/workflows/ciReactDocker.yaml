@@ -27,7 +27,7 @@ jobs:
     - name: Build and push backend
       uses: docker/build-push-action@v4
       with:
-        context: ./2-react-express-todo
+        context: ./2-react-express-todo/backend
         file: ./2-react-express-todo/backend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
@@ -35,7 +35,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
-        context: ./2-react-express-todo
+        context: ./2-react-express-todo/frontend
         file: ./2-react-express-todo/frontend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
