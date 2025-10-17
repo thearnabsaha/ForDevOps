@@ -1,0 +1,31 @@
+name: Deploy Next App to AWS VM
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.AWS_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Deploy to AWS VM
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          cd /home/${{ secrets.AWS_USER }}/ForDevOps/"3. next-todo"/next-todo-app
+          git pull origin main
+          npm install
+          npm run build
+          pm2 start "npm run start -- -p 3002" --name next-todo-app || pm2 restart all
+        EOF
