@@ -1,0 +1,48 @@
+name: Deploy Dockerized Next App to AWS VM
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.AWS_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: ./3-next-todo/next-todo-app
+        file: ./3-next-todo/next-todo-app/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
+
+    - name: Deploy to AWS VM
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+
+        echo "Cleaning old containers..."
+        sudo docker stop next-todo || true
+        sudo docker rm next-todo || true
+
+        echo "Removing old images..."
+        sudo docker image prune -af || true
+
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
+        sudo docker run -d --name next-todo -p 3002:3002 ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
+        EOF
