@@ -9,7 +9,8 @@ interface Todo {
   completed: boolean;
 }
 
-const API = "http://localhost:3003/todos"; // <-- change to your Express port
+const API = "http://backend:3003/todos"; // <-- change to your Express port
+// const API = "http://localhost:3003/todos"; // <-- change to your Express port
 
 export default function Page() {
   const [todos, setTodos] = useState<Todo[]>([]);
