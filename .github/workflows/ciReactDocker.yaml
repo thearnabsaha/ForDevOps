@@ -45,10 +45,10 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
 
         echo "Cleaning old containers..."
-        sudo docker stop react-backend-todo || true
-        sudo docker rm react-backend-todo || true
-        sudo docker stop react-frontend-todo || true
-        sudo docker rm react-frontend-todo || true
+        sudo docker stop ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo || true
+        sudo docker rm ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo || true
+        sudo docker stop ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo || true
+        sudo docker rm ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo || true
 
         echo "Removing old images..."
         sudo docker image prune -af || true
