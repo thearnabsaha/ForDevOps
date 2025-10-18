@@ -15,11 +15,9 @@ app.use(morgan(morganFormat));
 app.use(helmet());
 
 app.use(cors({
-    origin: "http://frontend:3004", // allow your React frontend for docker
+    origin: process.env.CORS_URL, // allow your React frontend for docker
     // origin: "http://localhost:3004", // allow your React frontend
     credentials: true,              // allow cookies if needed
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 

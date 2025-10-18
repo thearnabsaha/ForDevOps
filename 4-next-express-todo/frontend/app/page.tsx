@@ -8,8 +8,8 @@ interface Todo {
   title: string;
   completed: boolean;
 }
-
-const API = "http://backend:3003/todos"; // <-- change to your Express port
+const API = `${process.env.NEXT_PUBLIC_API_URL}/todos`; // <-- change to your Express port
+// const API = "http://:3003/todos"; // <-- change to your Express port
 // const API = "http://localhost:3003/todos"; // <-- change to your Express port
 
 export default function Page() {
