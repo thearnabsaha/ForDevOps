@@ -40,7 +40,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
         build-args: |
-          NEXT_PUBLIC_API_URL=http://next-backend:3003
+          NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003
 
     - name: Deploy to AWS VM
       run: |
