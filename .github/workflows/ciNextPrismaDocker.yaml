@@ -59,10 +59,7 @@ jobs:
 
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
-        sudo docker run -d --name next-backend --network next-todo-net -p 3003:3003 \
-          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-          -e CORS_URL=http://${{ secrets.AWS_HOST }}:3004 \
-          ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
+        sudo docker run -d --name next-backend --network next-todo-net -p 3003:3003 -e DATABASE_URL=${{ secrets.DATABASE_URL }} -e CORS_URL=http://${{ secrets.AWS_HOST }}:3004 ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
 
         sudo docker run -d --name next-frontend --network next-todo-net -p 3004:3004 ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
         EOF

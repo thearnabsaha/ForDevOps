@@ -1,65 +1,65 @@
-# name: Deploy Dockerized React App to AWS VM
+name: Deploy Dockerized React App to AWS VM
 
-# on:
-#   push:
-#     branches:
-#     - main
+on:
+  push:
+    branches:
+    - main
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - name: Checkout repo
-#       uses: actions/checkout@v3
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-#     - name: Set up SSH key
-#       run: |
-#         echo "${{ secrets.AWS_KEY }}" > key.pem
-#         chmod 600 key.pem
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.AWS_KEY }}" > key.pem
+        chmod 600 key.pem
 
-#     - name: Docker login
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#     - name: Build and push backend
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: ./2-react-express-todo/backend
-#         file: ./2-react-express-todo/backend/Dockerfile
-#         push: true
-#         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
+    - name: Build and push backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./2-react-express-todo/backend
+        file: ./2-react-express-todo/backend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
 
-#     - name: Build and push frontend
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: ./2-react-express-todo/frontend
-#         file: ./2-react-express-todo/frontend/Dockerfile
-#         push: true
-#         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+    - name: Build and push frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./2-react-express-todo/frontend
+        file: ./2-react-express-todo/frontend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
 
-#     - name: Deploy to AWS VM
-#       run: |
-#         ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+    - name: Deploy to AWS VM
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
 
-#         echo "Cleaning old containers..."
-#         sudo docker stop backend || true
-#         sudo docker rm backend || true
-#         sudo docker stop frontend || true
-#         sudo docker rm frontend || true
+        echo "Cleaning old containers..."
+        sudo docker stop backend || true
+        sudo docker rm backend || true
+        sudo docker stop frontend || true
+        sudo docker rm frontend || true
 
-#         echo "Removing old images..."
-#         sudo docker image prune -af || true
+        echo "Removing old images..."
+        sudo docker image prune -af || true
 
-#         sudo docker network create react-todo-net || true
+        sudo docker network create react-todo-net || true
 
-#         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
-#         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
-#         sudo docker run -d --name next-backend --network next-todo-net -p 3000:3000 \
-#           -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-#           -e CORS_URL=http://${{ secrets.AWS_HOST }}:4173 \
-#           ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
-#         sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
-#         EOF
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+        sudo docker run -d --name next-backend --network next-todo-net -p 3000:3000 \
+          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+          -e CORS_URL=http://${{ secrets.AWS_HOST }}:4173 \
+          ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
+        sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+        EOF
