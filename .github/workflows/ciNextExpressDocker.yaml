@@ -39,6 +39,8 @@ jobs:
         file: ./4-next-express-todo/frontend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
+        build-args: |
+          NEXT_PUBLIC_API_URL=http://next-backend:3003
 
     - name: Deploy to AWS VM
       run: |
@@ -61,7 +63,5 @@ jobs:
         sudo docker run -d --name next-backend --network next-todo-net -p 3003:3003 \
           -e "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" \
           ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
-        sudo docker run -d --name next-frontend --network next-todo-net -p 3004:3004 \
-          -e NEXT_PUBLIC_API_URL=http://next-backend:3003 \
-          ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
+        sudo docker run -d --name next-frontend --network next-todo-net -p 3004:3004 ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
         EOF
