@@ -44,5 +44,5 @@ jobs:
         sudo docker image prune -af || true
 
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
-        sudo docker run -d --name next-todo -p 3002:3002 ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
+        sudo docker run -d --name next-todo -p 3002:3002 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/next-todo:${{ github.sha }}
         EOF

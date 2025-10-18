@@ -44,5 +44,5 @@ jobs:
         sudo docker image prune -af || true
 
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
-        sudo docker run -d --name express-todo -p 3001:3001 ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
+        sudo docker run -d --name express-todo -p 3001:3001 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/express-todo:${{ github.sha }}
         EOF

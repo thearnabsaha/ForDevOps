@@ -57,6 +57,6 @@ jobs:
 
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
-        sudo docker run -d --name backend --network react-todo-net -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
-        sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+        sudo docker run -d --name backend --network react-todo-net -p 3000:3000 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
+        sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
         EOF

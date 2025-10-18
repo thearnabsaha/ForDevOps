@@ -1,4 +1,4 @@
-name: Deploy Dockerized React App to AWS VM
+name: Deploy Dockerized React Prisma App to AWS VM
 
 on:
   push:
@@ -57,9 +57,9 @@ jobs:
 
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
         sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
-        sudo docker run -d --name next-backend --network next-todo-net -p 3000:3000 \
+        sudo docker run -d --name next-backend --network next-todo-net -p 3000:3000 --restart unless-stopped \
           -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
           -e CORS_URL=http://${{ secrets.AWS_HOST }}:4173 \
           ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
-        sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
+        sudo docker run -d --name frontend --network react-todo-net -p 4173:4173 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
         EOF
