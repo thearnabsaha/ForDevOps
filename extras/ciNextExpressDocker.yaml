@@ -1,0 +1,62 @@
+name: Deploy Dockerized Next Express App to AWS VM
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.AWS_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./4-next-express-todo/backend
+        file: ./4-next-express-todo/backend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
+
+    - name: Build and push frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./4-next-express-todo/frontend
+        file: ./4-next-express-todo/frontend/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
+
+    - name: Deploy to AWS VM
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+
+        echo "Cleaning old containers..."
+        sudo docker stop next-backend || true
+        sudo docker rm next-backend || true
+        sudo docker stop next-frontend || true
+        sudo docker rm next-frontend || true
+
+        echo "Removing old images..."
+        sudo docker image prune -af || true
+
+        sudo docker network create next-todo-net || true
+
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
+        sudo docker run -d --name next-backend --network next-todo-net -p 3003:3003 ${{ secrets.DOCKERHUB_USERNAME }}/next-backend-todo:${{ github.sha }}
+        sudo docker run -d --name next-frontend --network next-todo-net -p 3004:3004 ${{ secrets.DOCKERHUB_USERNAME }}/next-frontend-todo:${{ github.sha }}
+        EOF
