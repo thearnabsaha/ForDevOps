@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/todos": "http://backend:3000",
+      "/todos": "http://react-backend:3000",
     }
   },
   preview: {
