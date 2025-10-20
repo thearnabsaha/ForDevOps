@@ -27,16 +27,16 @@ jobs:
     - name: Build and push backend
       uses: docker/build-push-action@v4
       with:
-        context: ./2-react-express-todo/backend
-        file: ./2-react-express-todo/backend/Dockerfile
+        context: ./6-react-prisma-todo/backend
+        file: ./6-react-prisma-todo/backend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-backend-todo:${{ github.sha }}
 
     - name: Build and push frontend
       uses: docker/build-push-action@v4
       with:
-        context: ./2-react-express-todo/frontend
-        file: ./2-react-express-todo/frontend/Dockerfile
+        context: ./6-react-prisma-todo/frontend
+        file: ./6-react-prisma-todo/frontend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-frontend-todo:${{ github.sha }}
 
