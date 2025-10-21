@@ -6,7 +6,11 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "generate:db": "cd packages/database && npx prisma generate",
+    "start:backend": "cd apps/backend && node dist/index.js",
+    "start:ws": "cd apps/ws && node dist/index.js",
+    "start:web": "cd apps/web && pnpm run start"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
