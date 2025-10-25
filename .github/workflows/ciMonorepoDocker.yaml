@@ -32,6 +32,14 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-docker-todo:${{ github.sha }}
 
+    - name: Build and push ws
+      uses: docker/build-push-action@v4
+      with:
+        context: ./7-monorepo-todo/
+        file: ./7-monorepo-todo/docker/Dockerfile.ws
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-ws-docker-todo:${{ github.sha }}
+
     - name: Build and push frontend
       uses: docker/build-push-action@v4
       with:
@@ -41,14 +49,6 @@ jobs:
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-docker-todo:${{ github.sha }}
         build-args: |
           monorepo_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003
-
-    - name: Build and push ws
-      uses: docker/build-push-action@v4
-      with:
-        context: ./7-monorepo-todo/
-        file: ./7-monorepo-todo/docker/Dockerfile.ws
-        push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-ws-docker-todo:${{ github.sha }}
 
     - name: Deploy to AWS VM
       run: |
@@ -73,10 +73,12 @@ jobs:
 
         sudo docker run -d --name monorepo-backend --network monorepo-todo-net -p 3003:3003 --restart unless-stopped \
           -e "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" \
+          -e "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
           ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-todo:${{ github.sha }}
 
         sudo docker run -d --name monorepo-ws --network monorepo-todo-net -p 3001:3001 --restart unless-stopped \
           -e "PORT=3001" \
+          -e "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
           ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-todo:${{ github.sha }}
           
         sudo docker run -d --name monorepo-frontend --network monorepo-todo-net -p 3004:3004 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-todo:${{ github.sha }}
