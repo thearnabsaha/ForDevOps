@@ -1,0 +1,84 @@
+name: Deploy Dockerized monorepo Express App to AWS VM
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.AWS_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./7-monorepo-todo/docker
+        file: ./7-monorepo-todo/apps/docker/Dockerfile.backend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-docker-todo:${{ github.sha }}
+
+    - name: Build and push frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./7-monorepo-todo/docker
+        file: ./7-monorepo-todo/docker/Dockerfile.frontend
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-docker-todo:${{ github.sha }}
+        build-args: |
+          monorepo_PUBLIC_API_URL=http://${{ secrets.AWS_HOST }}:3003
+
+    - name: Build and push ws
+      uses: docker/build-push-action@v4
+      with:
+        context: ./7-monorepo-todo/docker
+        file: ./7-monorepo-todo/docker/Dockerfile.ws
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-ws-docker-todo:${{ github.sha }}
+
+    - name: Deploy to AWS VM
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+
+        echo "Cleaning old containers..."
+        sudo docker stop monorepo-backend-docker-todo || true
+        sudo docker rm monorepo-backend-docker-todo || true
+        sudo docker stop monorepo-frontend-docker-todo || true
+        sudo docker rm monorepo-frontend-docker-todo || true
+        sudo docker stop monorepo-ws-docker-todo || true
+        sudo docker rm monorepo-ws-docker-todo || true
+
+        echo "Removing old images..."
+        sudo docker image prune -af || true
+
+        sudo docker network create monorepo-todo-net || true
+
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-docker-todo:${{ github.sha }}
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-docker-todo:${{ github.sha }}
+        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-ws-docker-todo:${{ github.sha }}
+
+        sudo docker run -d --name monorepo-backend --network monorepo-todo-net -p 3003:3003 --restart unless-stopped \
+          -e "CORS_URL=http://${{ secrets.AWS_HOST }}:3004" \
+          ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-todo:${{ github.sha }}
+
+        sudo docker run -d --name monorepo-ws --network monorepo-todo-net -p 3001:3001 --restart unless-stopped \
+          -e "PORT=3001" \
+          ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-todo:${{ github.sha }}
+          
+        sudo docker run -d --name monorepo-frontend --network monorepo-todo-net -p 3004:3004 --restart unless-stopped ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-todo:${{ github.sha }}
+
+        EOF
