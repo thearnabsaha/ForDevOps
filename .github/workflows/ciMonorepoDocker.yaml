@@ -28,7 +28,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./7-monorepo-todo/docker
-        file: ./7-monorepo-todo/apps/docker/Dockerfile.backend
+        file: ./7-monorepo-todo/docker/Dockerfile.backend
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-docker-todo:${{ github.sha }}
 
