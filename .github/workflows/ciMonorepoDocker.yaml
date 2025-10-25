@@ -27,7 +27,7 @@ jobs:
     - name: Build and push backend
       uses: docker/build-push-action@v4
       with:
-        context: ./7-monorepo-todo/docker
+        context: ./7-monorepo-todo/
         file: ./7-monorepo-todo/docker/Dockerfile.backend
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-backend-docker-todo:${{ github.sha }}
@@ -35,7 +35,7 @@ jobs:
     - name: Build and push frontend
       uses: docker/build-push-action@v4
       with:
-        context: ./7-monorepo-todo/docker
+        context: ./7-monorepo-todo/
         file: ./7-monorepo-todo/docker/Dockerfile.frontend
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-frontend-docker-todo:${{ github.sha }}
@@ -45,7 +45,7 @@ jobs:
     - name: Build and push ws
       uses: docker/build-push-action@v4
       with:
-        context: ./7-monorepo-todo/docker
+        context: ./7-monorepo-todo/
         file: ./7-monorepo-todo/docker/Dockerfile.ws
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-ws-docker-todo:${{ github.sha }}
