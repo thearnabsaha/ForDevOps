@@ -2,9 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 RUN npm install -g pnpm
-RUN ls
 COPY . .
-RUN ls
 RUN pnpm install
 RUN pnpm run generate:db
 RUN pnpm run build
