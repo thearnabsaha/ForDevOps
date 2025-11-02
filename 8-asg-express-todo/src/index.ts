@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import client from "prom-client";
+import { cleanupMiddleware, metricsMiddleware, requestCountMiddleware } from './middlewares';
 
 const todos: any = []
 const morganFormat = ':method :url :status :response-time ms';
@@ -20,6 +22,9 @@ app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static('public'));
 app.use(cookieParser());
+app.use(requestCountMiddleware)
+app.use(cleanupMiddleware)
+app.use(metricsMiddleware)
 app.use((req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -36,7 +41,7 @@ app.get('/health', async (req, res) => {
 });
 app.get('/cpu', (req, res) => {
     let sum = 0;
-    for (let i = 0; i < 100000000; i++) {
+    for (let i = 0; i < 1000000000; i++) {
         sum += i;
     }
     res.status(200).json(sum);
@@ -45,6 +50,11 @@ app.get('/cpu', (req, res) => {
 app.get('/', (req, res) => {
     res.send('Its a beautiful world ;)');
     // res.send('Its a beautiful world!');
+});
+app.get('/metrics', async (req, res) => {
+    const metrics = await client.register.metrics();
+    res.set('Content-Type', client.register.contentType);
+    res.send(metrics);
 });
 // GET all todos
 app.get("/todos", (req, res) => {
