@@ -22,6 +22,6 @@ if (cluster.isPrimary) {
     });
 } else {
     app.listen(port, () => {
-        console.log(`App listening on port ${port}`);
+        console.log(`App Worker ${process.pid} listening on port ${port}`);
     });
 }
