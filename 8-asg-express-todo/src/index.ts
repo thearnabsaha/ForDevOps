@@ -107,5 +107,5 @@ app.delete("/todos/:id", (req, res) => {
     res.status(204).send();
 });
 
-app.listen(port, () => console.log('> Server is up and running on port: ' + port));
+// app.listen(port, () => console.log('> Server is up and running on port: ' + port));
 export default app

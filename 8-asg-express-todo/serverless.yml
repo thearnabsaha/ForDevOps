@@ -1,0 +1,18 @@
+service: express-lambda-app
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  environment:
+    NODE_ENV: production
+
+functions:
+  api:
+    handler: lambda.handler
+    events:
+    - httpApi: '*' # exposes all routes under a public API
+
+plugins:
+- serverless-offline
