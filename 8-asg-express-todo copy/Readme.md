@@ -5,7 +5,6 @@ curl -X POST http://localhost:3000/todos \
 
 curl http://localhost:3000/todos
 
-
 curl -X PUT http://localhost:3000/todos/1 \
 -H "Content-Type: application/json" \
 -d '{"completed": true}'
