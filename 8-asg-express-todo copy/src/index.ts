@@ -9,7 +9,6 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import client from "prom-client";
 import { cleanupMiddleware, metricsMiddleware, requestCountMiddleware } from './middlewares';
-
 const todos: any = []
 const morganFormat = ':method :url :status :response-time ms';
 
