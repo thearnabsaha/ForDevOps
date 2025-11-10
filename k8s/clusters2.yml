@@ -8,3 +8,4 @@ nodes:
     hostPort: 30007
 - role: worker
 - role: worker
+
